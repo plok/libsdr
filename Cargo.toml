@@ -6,8 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dasp = { version="0.11.0", features=["all"] }
 audio_thread_priority = "0.23.4"
-rodio = "0.14.0"
 midly = "0.5"
 rand = "0.8.4"
 rand_distr = "0.4.3"
+anyhow = "1"
+cpal = "0.12"
+find_folder = "0.3"
+hound = "3"
