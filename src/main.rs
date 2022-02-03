@@ -1,53 +1,45 @@
-mod pattern;
-use rand_distr::{Binomial, Distribution };
+use rodio::Source;
 use std::fs::File;
 use std::io::BufReader;
-use std::time::Duration;
-use rodio::{Decoder, OutputStream, Sink};
-use rodio::source::{SineWave, Source};
-use audio_thread_priority;
+
+const SPEED: u64 = 100_000_000;
+const KICK_SAMPLES: [u8; 8] = [1, 0, 0, 0, 1, 1, 0, 0];
+const SNAR_SAMPLES: [u8; 8] = [0, 0, 1, 0, 0, 0, 1, 0];
+const INTERVAL_ACCURARY: u32 = 1;
+
 fn main() {
-    let mut var = pattern::Pattern::new(8);
+    std::thread::spawn(move || {
+        play_beat("examples/kick.wav", &KICK_SAMPLES);
+    });
 
+    std::thread::spawn(move || {
+        play_beat("examples/snare.wav", &SNAR_SAMPLES);
+    });
 
-        match audio_thread_priority::promote_current_thread_to_real_time(128, 48000) {
-                Ok(_h) => {
-                                println!("this thread is now bumped to real-time priority.") 
-                                        }
-                    Err(_e) => { println!("could not bump to real time.") }
-                      }
-    var.add_hit(3,  pattern::Hit{ length: 1, velocity: 123});
-    var.add_hit(1,  pattern::Hit{ length: 2, velocity: 123});
-    println!("Hello, world!");
-    let bin = Binomial::new(128, 0.8).unwrap();
-
-    // Decode that sound file into a source
-
-    let (_stream, stream_handle) = OutputStream::try_default().unwrap();
-    let (_sstream, sstream_handle) = OutputStream::try_default().unwrap();
-
-    let file = BufReader::new(File::open("examples/kick.wav").unwrap());
-        let source = Decoder::new(file).unwrap();
-        let buffered = source.buffered();
-
-    let sfile = BufReader::new(File::open("examples/snare.wav").unwrap());
-        let ssource = Decoder::new(sfile).unwrap();
-        let sbuffered = ssource.buffered();
-    let mut i = 0.0;
     loop {
-    
-        i+=1.0;
-        
-        
-        let k = buffered.clone().convert_samples();
-        let s = sbuffered.clone().amplify(0.5).convert_samples();
+        std::thread::sleep(std::time::Duration::from_secs(1));
+    }
+}
 
-        let _result = stream_handle.play_raw(k);
-        if i % 8.0 == 0.0 {
-            let _result = sstream_handle.play_raw(s);
+fn play_beat(file_name: &str, samples: &[u8]) {
+    let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+
+    // Load a sound from a file, using a path relative to Cargo.toml
+    let source_kick_buffered = rodio::Decoder::new(BufReader::new(File::open(file_name).unwrap()))
+        .unwrap()
+        .buffered()
+        .convert_samples();
+    // Not too sure about this one or the atomic timer
+    let spin_sleeper = spin_sleep::SpinSleeper::new(INTERVAL_ACCURARY);
+    let mut i = 0;
+    loop {
+        if samples[i] == 1 {
+            let _res = stream_handle.play_raw(source_kick_buffered.clone());
         }
-        if i==8.0 {i = 0.0};
-std::thread::sleep(std::time::Duration::from_millis(80));
-
+        i += 1;
+        if i == samples.len() {
+            i = 0;
+        }
+        spin_sleeper.sleep_ns(SPEED);
     }
 }
