@@ -7,7 +7,6 @@ use crate::instrument;
 use instrument::instrument::Instrument;
 
 /// Number of playback channels.
-/// Chaning this to two gives a better sound, but breaks the play_repeat method to only play the
 /// first measurement
 const CHANNELS: u16 = 1;
 
@@ -16,7 +15,7 @@ const SAMPLE_RATE: u32 = 44_100;
 
 pub fn create_sample(
     tempo: &Tempo,
-    instruments: Vec<Instrument>,
+    instruments: &[Instrument],
 ) -> Box<dyn Source<Item = i16> + Send> {
     let (controller, mixer) = rodio::dynamic_mixer::mixer(CHANNELS, SAMPLE_RATE);
 

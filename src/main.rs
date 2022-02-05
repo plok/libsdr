@@ -30,7 +30,7 @@ fn main() {
         ),
     ];
 
-    let sample = sampler::create_sample(&tempo, instruments);
-    //sampler::play_once(&tempo, sample);
+    let sample = sampler::create_sample(&tempo, &instruments);
+    //       sampler::play_once(&tempo, sample);
     sampler::play_repeat(&tempo, sample);
 }
