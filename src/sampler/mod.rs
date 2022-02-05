@@ -55,9 +55,9 @@ pub fn play_repeat(tempo: &Tempo, mix: Box<dyn Source<Item = i16> + Send>) {
     let _res = stream_handle.play_raw(
         mix
             // forward pad with trailing silence
-            .delay(timing::delay_pad_duration(&tempo, 0))
+            .delay(timing::delay_pad_duration(tempo, 0))
             // trim to measure length
-            .take_duration(timing::measure_duration(&tempo))
+            .take_duration(timing::measure_duration(tempo))
             .repeat_infinite()
             .convert_samples(),
     );
