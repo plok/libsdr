@@ -1,10 +1,10 @@
-mod timing;
-use timing::tempo::Tempo;
+extern crate libsdr;
 
-mod instrument;
-use instrument::instrument::Instrument;
+use libsdr::timing::tempo::Tempo;
 
-mod sampler;
+use libsdr::instrument::instrument::Instrument;
+
+use libsdr::sampler;
 
 fn main() {
     let tempo = Tempo::from(120);

@@ -1,11 +1,11 @@
-use crate::timing;
-use crate::Tempo;
 use rodio::Source;
 use std::io::BufReader;
 
 use crate::instrument;
 use instrument::instrument::Instrument;
 
+use crate::timing;
+use timing::tempo::Tempo;
 /// Number of playback channels.
 /// first measurement
 const CHANNELS: u16 = 1;
