@@ -251,13 +251,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "drumz"
-version = "0.1.0"
-dependencies = [
- "rodio",
-]
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -365,6 +358,13 @@ checksum = "efbc0f03f9a775e9f6aed295c6a1ba2253c5757a9e03d55c6caa46a681abcddd"
 dependencies = [
  "cfg-if",
  "winapi",
+]
+
+[[package]]
+name = "libsdr"
+version = "0.1.0"
+dependencies = [
+ "rodio",
 ]
 
 [[package]]
