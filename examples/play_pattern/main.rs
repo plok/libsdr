@@ -1,10 +1,8 @@
 extern crate libsdr;
 
-use libsdr::timing::tempo::Tempo;
-
 use libsdr::instrument::instrument::Instrument;
-
 use libsdr::sampler;
+use libsdr::timing::tempo::Tempo;
 
 fn main() {
     let tempo = Tempo::from(140);
@@ -53,7 +51,7 @@ fn main() {
 
     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
     let sink = rodio::Sink::try_new(&stream_handle).unwrap();
-    let looper: sampler::Looper = sink.into();
+    let mut looper: sampler::Looper = sink.into();
 
     // Prepare samples
     for _ in 0..=4 {
