@@ -9,7 +9,7 @@ use libsdr::sampler;
 fn main() {
     let tempo = Tempo::from(120);
 
-    let instruments = vec![
+    let beat1 = vec![
         Instrument::new(
             "assets/kick.wav",
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].to_vec(),
@@ -18,7 +18,7 @@ fn main() {
         ),
         Instrument::new(
             "assets/snare.wav",
-            [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1].to_vec(),
+            [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0].to_vec(),
             //          |           |           |          |
             Some(0.4),
         ),
@@ -30,7 +30,33 @@ fn main() {
         ),
     ];
 
-    let sample = sampler::create_sample(&tempo, &instruments);
-    //       sampler::play_once(&tempo, sample);
-    sampler::play_repeat(&tempo, sample);
+    let beat2 = vec![
+        Instrument::new(
+            "assets/kick.wav",
+            [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0].to_vec(),
+            //          |           |           |          |
+            None,
+        ),
+        Instrument::new(
+            "assets/snare.wav",
+            [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1].to_vec(),
+            //          |           |           |          |
+            Some(0.4),
+        ),
+        Instrument::new(
+            "assets/Ride_A/Ride_A_2.wav",
+            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].to_vec(),
+            //          |           |           |          |
+            Some(0.8),
+        ),
+    ];
+
+    let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+    let sink = rodio::Sink::try_new(&stream_handle).unwrap();
+    let looper: sampler::Looper = sink.into();
+    looper.play_repeat(&tempo, &beat1, 3);
+    looper.play_repeat(&tempo, &beat2, 1);
+    looper.play_repeat(&tempo, &beat1, 3);
+    looper.play_repeat(&tempo, &beat2, 1);
+    looper.play_till_end();
 }

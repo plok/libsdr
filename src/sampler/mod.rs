@@ -1,10 +1,7 @@
-use rodio::Source;
-use std::io::BufReader;
-
 use crate::instrument;
-use instrument::instrument::Instrument;
-
 use crate::timing;
+use instrument::instrument::Instrument;
+use rodio::Source;
 use timing::tempo::Tempo;
 /// Number of playback channels.
 /// first measurement
@@ -13,54 +10,45 @@ const CHANNELS: u16 = 1;
 /// Sample rate of playback.
 const SAMPLE_RATE: u32 = 44_100;
 
-pub fn create_sample(
-    tempo: &Tempo,
-    instruments: &[Instrument],
-) -> Box<dyn Source<Item = i16> + Send> {
-    let (controller, mixer) = rodio::dynamic_mixer::mixer(CHANNELS, SAMPLE_RATE);
+pub struct Looper {
+    sink: rodio::Sink,
+}
 
-    for instrument in instruments.iter() {
-        let file = std::fs::File::open(&instrument.source_path).unwrap();
-        let source = rodio::Decoder::new(BufReader::new(file))
-            .unwrap()
-            .buffered();
+impl From<rodio::Sink> for Looper {
+    fn from(sink: rodio::Sink) -> Self {
+        Self { sink }
+    }
+}
 
-        for (i, step) in instrument.pattern.iter().enumerate() {
-            if !step {
-                continue;
-            }
-            let delay = timing::step_duration(tempo) * (i as u32);
-            controller.add(source.clone().amplify(instrument.amplify).delay(delay));
+impl Looper {
+    /// Plays a mixed pattern repeatedly for given amount of repeats
+    pub fn play_repeat(&self, tempo: &Tempo, instruments: &[Instrument], nr_of_repeats: usize) {
+        for _ in 0..=nr_of_repeats {
+            self.play_once(tempo, instruments);
         }
     }
 
-    Box::new(mixer)
-}
+    pub fn play_till_end(&self) {
+        self.sink.sleep_until_end();
+    }
 
-/// Plays a mixed pattern repeatedly.
-pub fn play_once(tempo: &Tempo, mix: Box<dyn Source<Item = i16> + Send>) {
-    let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+    pub fn play_once(&self, tempo: &Tempo, instruments: &[Instrument]) {
+        let (controller, mixer) = rodio::dynamic_mixer::mixer(CHANNELS, SAMPLE_RATE);
 
-    // play the pattern
-    let _res = stream_handle.play_raw(mix.convert_samples());
+        for instrument in instruments.iter() {
+            let file = std::fs::File::open(&instrument.source_path).unwrap();
+            let file_buffer = std::io::BufReader::new(file);
+            let source = rodio::Decoder::new(file_buffer).unwrap().buffered();
 
-    // sleep for the duration of a single measure
-    std::thread::sleep(timing::measure_duration(tempo));
-}
-
-/// Plays a mixed pattern repeatedly.
-pub fn play_repeat(tempo: &Tempo, mix: Box<dyn Source<Item = i16> + Send>) {
-    let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
-    // play the pattern
-    let _res = stream_handle.play_raw(
-        mix
-            // forward pad with trailing silence
-            .delay(timing::delay_pad_duration(tempo, 0))
-            // trim to measure length
-            .take_duration(timing::measure_duration(tempo))
-            .repeat_infinite()
-            .convert_samples(),
-    );
-    // sleep forever
-    std::thread::park();
+            for (i, step) in instrument.pattern.iter().enumerate() {
+                if !step {
+                    continue;
+                }
+                let delay = timing::step_duration(tempo) * (i as u32);
+                controller.add(source.clone().amplify(instrument.amplify).delay(delay));
+            }
+        }
+        self.sink
+            .append(mixer.take_duration(timing::measure_duration(tempo)));
+    }
 }
