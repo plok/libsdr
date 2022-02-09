@@ -7,7 +7,7 @@ use libsdr::instrument::instrument::Instrument;
 use libsdr::sampler;
 
 fn main() {
-    let tempo = Tempo::from(120);
+    let tempo = Tempo::from(140);
 
     let beat1 = vec![
         Instrument::new(
@@ -54,9 +54,12 @@ fn main() {
     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
     let sink = rodio::Sink::try_new(&stream_handle).unwrap();
     let looper: sampler::Looper = sink.into();
-    looper.play_repeat(&tempo, &beat1, 3);
-    looper.play_repeat(&tempo, &beat2, 1);
-    looper.play_repeat(&tempo, &beat1, 3);
-    looper.play_repeat(&tempo, &beat2, 1);
+
+    // Prepare samples
+    for _ in 0..=4 {
+        looper.add_repeated(&tempo, &beat1, 3);
+        looper.add_once(&tempo, &beat2); // could also be add_repeated with 1
+    }
+    // play
     looper.play_till_end();
 }
