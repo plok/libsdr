@@ -35,13 +35,17 @@ impl Sampler {
         instruments: &[Instrument],
         nr_of_repeats: usize,
     ) {
+        // for the number of repeats given
         for _ in 0..=nr_of_repeats {
+            // append a new sample to the sink
             self.add_once(tempo, instruments);
         }
     }
 
-    /// Plays a sample only once, prepares the mix for all the given instruments
+    /// Appends a sample only once to the sink, prepares the mix for all the given instruments
     pub fn add_once(&mut self, tempo: &Tempo, instruments: &[Instrument]) {
+        // initialize a mixer and a controller instance for the given amount of channels and the
+        // sample rate
         let (controller, mixer) = mixer(CHANNELS, SAMPLE_RATE);
 
         for instrument in instruments.iter() {
@@ -55,6 +59,8 @@ impl Sampler {
                     let file_buffer = BufReader::new(file);
                     Decoder::new(file_buffer).unwrap().buffered()
                 });
+
+            // For each step that is marked at a hit, add a step to the controller
             for (i, step) in instrument.pattern.iter().enumerate() {
                 if !step {
                     continue;
@@ -63,6 +69,8 @@ impl Sampler {
                 controller.add(source.clone().amplify(instrument.amplify).delay(delay));
             }
         }
+
+        // append the mix for all instruments to the sink
         self.sink
             .append(mixer.take_duration(measure_duration(tempo)));
     }

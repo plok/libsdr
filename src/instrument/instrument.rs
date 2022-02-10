@@ -35,11 +35,16 @@ pub struct Instrument {
 }
 
 impl Instrument {
-    pub fn try_default(
+    /// Will attempt to create a new instrument instance.
+    ///
+    /// If the given source_path is not found, this method will throw an exception.
+    /// Other wise, a new instance will be returned succesfully
+    pub fn try_new(
         source_path: &str,
         pattern: Vec<u8>,
         amplify: Option<f32>,
     ) -> Result<Self, Error> {
+        // Validate that the file we want to load, it actually present on the hard drive
         if !Path::new(source_path).exists() {
             return Err(Error::new(
                 ErrorKind::NotFound,
@@ -47,6 +52,7 @@ impl Instrument {
             ));
         }
 
+        // Success, return the result
         Ok(Instrument {
             source_path: source_path.to_string(),
             pattern: pattern.iter().map(|p| p != &0).collect(),

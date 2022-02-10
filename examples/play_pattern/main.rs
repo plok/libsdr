@@ -8,21 +8,21 @@ fn main() {
     let tempo = Tempo::from(140);
 
     let beat1 = vec![
-        Instrument::try_default(
+        Instrument::try_new(
             "assets/kick.wav",
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].to_vec(),
             //          |           |           |          |
             None,
         )
         .unwrap(),
-        Instrument::try_default(
+        Instrument::try_new(
             "assets/snare.wav",
             [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0].to_vec(),
             //          |           |           |          |
             Some(0.4),
         )
         .unwrap(),
-        Instrument::try_default(
+        Instrument::try_new(
             "assets/Ride_A/Ride_A_2.wav",
             [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0].to_vec(),
             //          |           |           |          |
@@ -32,21 +32,21 @@ fn main() {
     ];
 
     let beat2 = vec![
-        Instrument::try_default(
+        Instrument::try_new(
             "assets/kick.wav",
             [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0].to_vec(),
             //          |           |           |          |
             None,
         )
         .unwrap(),
-        Instrument::try_default(
+        Instrument::try_new(
             "assets/snare.wav",
             [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1].to_vec(),
             //          |           |           |          |
             Some(0.4),
         )
         .unwrap(),
-        Instrument::try_default(
+        Instrument::try_new(
             "assets/Ride_A/Ride_A_2.wav",
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].to_vec(),
             //          |           |           |          |
