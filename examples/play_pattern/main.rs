@@ -1,57 +1,63 @@
 extern crate libsdr;
 
 use libsdr::instrument::instrument::Instrument;
-use libsdr::sampler;
+use libsdr::sampler::sampler;
 use libsdr::timing::tempo::Tempo;
 
 fn main() {
     let tempo = Tempo::from(140);
 
     let beat1 = vec![
-        Instrument::new(
+        Instrument::try_default(
             "assets/kick.wav",
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].to_vec(),
             //          |           |           |          |
             None,
-        ),
-        Instrument::new(
+        )
+        .unwrap(),
+        Instrument::try_default(
             "assets/snare.wav",
             [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0].to_vec(),
             //          |           |           |          |
             Some(0.4),
-        ),
-        Instrument::new(
+        )
+        .unwrap(),
+        Instrument::try_default(
             "assets/Ride_A/Ride_A_2.wav",
             [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0].to_vec(),
             //          |           |           |          |
             Some(0.8),
-        ),
+        )
+        .unwrap(),
     ];
 
     let beat2 = vec![
-        Instrument::new(
+        Instrument::try_default(
             "assets/kick.wav",
             [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0].to_vec(),
             //          |           |           |          |
             None,
-        ),
-        Instrument::new(
+        )
+        .unwrap(),
+        Instrument::try_default(
             "assets/snare.wav",
             [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1].to_vec(),
             //          |           |           |          |
             Some(0.4),
-        ),
-        Instrument::new(
+        )
+        .unwrap(),
+        Instrument::try_default(
             "assets/Ride_A/Ride_A_2.wav",
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].to_vec(),
             //          |           |           |          |
             Some(0.8),
-        ),
+        )
+        .unwrap(),
     ];
 
     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
     let sink = rodio::Sink::try_new(&stream_handle).unwrap();
-    let mut looper: sampler::Looper = sink.into();
+    let mut looper: sampler::Sampler = sink.into();
 
     // Prepare samples
     for _ in 0..=4 {

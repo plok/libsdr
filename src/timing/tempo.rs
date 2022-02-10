@@ -2,8 +2,11 @@
 pub struct Tempo(pub u16);
 
 impl From<u16> for Tempo {
-    #[inline]
-    fn from(v: u16) -> Tempo {
-        Tempo(v)
+    /// converts creates a new Tempo instance and stores the given beats per minute
+    ///
+    /// # Examples
+    /// `120`
+    fn from(beats_per_minute: u16) -> Tempo {
+        Tempo(beats_per_minute)
     }
 }
