@@ -1,6 +1,6 @@
+use crate::models;
+use models::tempo::Tempo;
 use std::time::Duration;
-pub mod tempo;
-use tempo::Tempo;
 
 /// The number of steps in a measure.
 ///
@@ -36,5 +36,5 @@ pub fn delay_pad_duration(tempo: &Tempo, trailing_silent_steps: usize) -> Durati
 
 /// Computes a factor necessary for delay-padding a mix played on repeat.
 pub fn delay_factor(tempo: &Tempo) -> f32 {
-    -1.0 / 120.0 * tempo.0 as f32 + 2.0
+    -1.0 / 400.0 * tempo.0 as f32 + 2.0
 }

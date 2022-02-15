@@ -1,70 +1,48 @@
 extern crate libsdr;
 
-use libsdr::instrument::instrument::{Instrument, InstrumentType};
+use libsdr::models::{
+    instrument::Instrument, instrument::InstrumentType, tempo::Tempo, track::Track,
+};
 use libsdr::sampler::sampler;
-use libsdr::timing::tempo::Tempo;
 
 fn main() {
     let tempo = Tempo::from(140);
 
+    let kick = Instrument::try_new("Kick drum", InstrumentType::Kick, "assets/kick.wav").unwrap();
+    let snare = Instrument::try_new("Snare", InstrumentType::Snare, "assets/snare.wav").unwrap();
+    let ride =
+        Instrument::try_new("Ride", InstrumentType::Cymbal, "assets/Ride_A/Ride_A_2.wav").unwrap();
+
     let beat1 = vec![
-        Instrument::try_new(
-            "Kick drum",
-            InstrumentType::Kick,
-            "assets/kick.wav",
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].to_vec(),
-            //          |           |           |          |
-            None,
-        )
-        .unwrap(),
-        Instrument::try_new(
-            "Snare",
-            InstrumentType::Snare,
-            "assets/snare.wav",
-            [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0].to_vec(),
-            //          |           |           |          |
-            Some(0.4),
-        )
-        .unwrap(),
-        Instrument::try_new(
-            "Ride",
-            InstrumentType::Cymbal,
-            "assets/Ride_A/Ride_A_2.wav",
-            [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0].to_vec(),
-            //          |           |           |          |
-            Some(0.8),
-        )
-        .unwrap(),
+        Track {
+            instrument: &kick,
+            hits: [
+                128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128,
+            ]
+            .to_vec(),
+        },
+        Track {
+            instrument: &snare,
+            hits: [0, 0, 50, 0, 0, 0, 50, 0, 0, 0, 50, 0, 0, 0, 50, 0].to_vec(),
+        },
+        Track {
+            instrument: &ride,
+            hits: [
+                100, 0, 100, 0, 100, 0, 100, 0, 100, 0, 100, 0, 100, 0, 100, 0,
+            ]
+            .to_vec(),
+        },
     ];
 
     let beat2 = vec![
-        Instrument::try_new(
-            "Kick drum",
-            InstrumentType::Kick,
-            "assets/kick.wav",
-            [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0].to_vec(),
-            //          |           |           |          |
-            None,
-        )
-        .unwrap(),
-        Instrument::try_new(
-            "Snare",
-            InstrumentType::Snare,
-            "assets/snare.wav",
-            [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1].to_vec(),
-            //          |           |           |          |
-            Some(0.4),
-        )
-        .unwrap(),
-        Instrument::try_new(
-            "Ride",
-            InstrumentType::Cymbal,
-            "assets/Ride_A/Ride_A_2.wav",
-            [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].to_vec(),
-            //          |           |           |          |
-            Some(0.8),
-        )
-        .unwrap(),
+        Track {
+            instrument: &kick,
+            hits: [0, 0, 128, 128, 0, 0, 128, 128, 128, 128, 0, 0, 0, 0, 0, 0].to_vec(),
+        },
+        Track {
+            instrument: &snare,
+            hits: [50, 50, 0, 0, 50, 50, 0, 0, 0, 0, 10, 20, 30, 40, 50, 50].to_vec(),
+        },
     ];
 
     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();

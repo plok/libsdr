@@ -1,10 +1,10 @@
-use crate::instrument;
+use crate::models;
 use crate::sampler::{CHANNELS, SAMPLE_RATE};
 use crate::timing;
-use instrument::instrument::Instrument;
+use models::{tempo::Tempo, track::Track};
 use rodio::{dynamic_mixer::mixer, source::Buffered, Decoder, Sink, Source};
 use std::{collections::HashMap, fs::File, io::BufReader};
-use timing::{measure_duration, step_duration, tempo::Tempo};
+use timing::{measure_duration, step_duration};
 
 /// Defines a sampler which is able to play a sequence of instrument beats in a mix
 pub struct Sampler {
@@ -29,44 +29,41 @@ impl From<Sink> for Sampler {
 
 impl Sampler {
     /// Plays a mixed pattern repeatedly for given amount of repeats
-    pub fn add_repeated(
-        &mut self,
-        tempo: &Tempo,
-        instruments: &[Instrument],
-        nr_of_repeats: usize,
-    ) {
+    pub fn add_repeated(&mut self, tempo: &Tempo, tracks: &[Track], nr_of_repeats: usize) {
         // for the number of repeats given
         for _ in 0..=nr_of_repeats {
             // append a new sample to the sink
-            self.add_once(tempo, instruments);
+            self.add_once(tempo, tracks);
         }
     }
 
     /// Appends a sample only once to the sink, prepares the mix for all the given instruments
-    pub fn add_once(&mut self, tempo: &Tempo, instruments: &[Instrument]) {
+    pub fn add_once(&mut self, tempo: &Tempo, tracks: &[Track]) {
         // initialize a mixer and a controller instance for the given amount of channels and the
         // sample rate
         let (controller, mixer) = mixer(CHANNELS, SAMPLE_RATE);
 
-        for instrument in instruments.iter() {
+        for track in tracks.iter() {
             // See if we already have a buffered file decoder ready to re-used, otherwise
             // initialize and add to our hashmap
             let source = self
                 .source_buffers
-                .entry(instrument.source_path.clone())
+                .entry(track.instrument.source_path.clone())
                 .or_insert({
-                    let file = File::open(&instrument.source_path).unwrap();
+                    let file = File::open(&track.instrument.source_path).unwrap();
                     let file_buffer = BufReader::new(file);
                     Decoder::new(file_buffer).unwrap().buffered()
                 });
 
             // For each step that is marked at a hit, add a step to the controller
-            for (i, step) in instrument.pattern.iter().enumerate() {
-                if !step {
+            for (i, step) in track.hits.iter().enumerate() {
+                if step < &0 {
                     continue;
                 }
+
+                let amplify = (step.clone() as f32) / 128.0;
                 let delay = step_duration(tempo) * (i as u32);
-                controller.add(source.clone().amplify(instrument.amplify).delay(delay));
+                controller.add(source.clone().amplify(amplify).delay(delay));
             }
         }
 
