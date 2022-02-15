@@ -1,6 +1,6 @@
 extern crate libsdr;
 
-use libsdr::instrument::instrument::Instrument;
+use libsdr::instrument::instrument::{Instrument, InstrumentType};
 use libsdr::sampler::sampler;
 use libsdr::timing::tempo::Tempo;
 
@@ -9,6 +9,8 @@ fn main() {
 
     let beat1 = vec![
         Instrument::try_new(
+            "Kick drum",
+            InstrumentType::Kick,
             "assets/kick.wav",
             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1].to_vec(),
             //          |           |           |          |
@@ -16,6 +18,8 @@ fn main() {
         )
         .unwrap(),
         Instrument::try_new(
+            "Snare",
+            InstrumentType::Snare,
             "assets/snare.wav",
             [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0].to_vec(),
             //          |           |           |          |
@@ -23,6 +27,8 @@ fn main() {
         )
         .unwrap(),
         Instrument::try_new(
+            "Ride",
+            InstrumentType::Cymbal,
             "assets/Ride_A/Ride_A_2.wav",
             [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0].to_vec(),
             //          |           |           |          |
@@ -33,6 +39,8 @@ fn main() {
 
     let beat2 = vec![
         Instrument::try_new(
+            "Kick drum",
+            InstrumentType::Kick,
             "assets/kick.wav",
             [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0].to_vec(),
             //          |           |           |          |
@@ -40,6 +48,8 @@ fn main() {
         )
         .unwrap(),
         Instrument::try_new(
+            "Snare",
+            InstrumentType::Snare,
             "assets/snare.wav",
             [0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1].to_vec(),
             //          |           |           |          |
@@ -47,6 +57,8 @@ fn main() {
         )
         .unwrap(),
         Instrument::try_new(
+            "Ride",
+            InstrumentType::Cymbal,
             "assets/Ride_A/Ride_A_2.wav",
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].to_vec(),
             //          |           |           |          |

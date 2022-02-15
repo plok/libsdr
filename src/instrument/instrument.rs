@@ -32,6 +32,25 @@ pub struct Instrument {
     /// `1.0` (plays at 100% volume)
     /// `0.0` (what's that?)
     pub amplify: f32,
+
+    /// The name of the instrument.
+    ///
+    /// #Example
+    /// `Kick drum`
+    pub name: String,
+
+    /// The type of instrument this is,
+    ///
+    /// # Example
+    /// `Snare`
+    pub instrument_type: InstrumentType,
+}
+
+pub enum InstrumentType {
+    Snare,
+    Kick,
+    Tom,
+    Cymbal,
 }
 
 impl Instrument {
@@ -40,6 +59,8 @@ impl Instrument {
     /// If the given source_path is not found, this method will throw an exception.
     /// Other wise, a new instance will be returned succesfully
     pub fn try_new(
+        name: &str,
+        instrument_type: InstrumentType,
         source_path: &str,
         pattern: Vec<u8>,
         amplify: Option<f32>,
@@ -54,6 +75,8 @@ impl Instrument {
 
         // Success, return the result
         Ok(Instrument {
+            name: name.to_string(),
+            instrument_type,
             source_path: source_path.to_string(),
             pattern: pattern.iter().map(|p| p != &0).collect(),
             amplify: match amplify {
