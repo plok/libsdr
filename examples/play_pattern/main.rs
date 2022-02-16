@@ -8,6 +8,7 @@ use libsdr::sampler::sampler;
 
 fn main() {
     let tempo = Tempo::from(140);
+    let tempo2 = Tempo::from(110);
 
     let kick = Instrument::try_new("Kick drum", InstrumentType::Kick, "assets/kick.wav").unwrap();
     let snare = Instrument::try_new("Snare", InstrumentType::Snare, "assets/snare.wav").unwrap();
@@ -49,6 +50,18 @@ fn main() {
     ];
 
     let pattern2: Pattern = Pattern::new((4, 4), 4, &tempo, beat2);
+    let beat3 = vec![
+        Track {
+            instrument: &kick,
+            hits: [128, 0, 0, 128, 0, 0, 128, 0, 0, 128, 0, 0].to_vec(),
+        },
+        Track {
+            instrument: &snare,
+            hits: [0, 50, 50, 0, 50, 50, 0, 50, 50, 0, 50, 50].to_vec(),
+        },
+    ];
+
+    let pattern3: Pattern = Pattern::new((3, 4), 4, &tempo2, beat3);
     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
     let sink = rodio::Sink::try_new(&stream_handle).unwrap();
     let mut looper: sampler::Sampler = sink.into();
@@ -57,6 +70,7 @@ fn main() {
     for _ in 0..=4 {
         looper.add_repeated(&pattern1, 3);
         looper.add_once(&pattern2); // could also be add_repeated with 1
+        looper.add_once(&pattern3);
     }
     // play
     looper.play_till_end();
