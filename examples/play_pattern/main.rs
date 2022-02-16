@@ -1,7 +1,8 @@
 extern crate libsdr;
 
 use libsdr::models::{
-    instrument::Instrument, instrument::InstrumentType, tempo::Tempo, track::Track,
+    instrument::Instrument, instrument::InstrumentType, pattern::Pattern, tempo::Tempo,
+    track::Track,
 };
 use libsdr::sampler::sampler;
 
@@ -34,6 +35,8 @@ fn main() {
         },
     ];
 
+    let pattern1: Pattern = Pattern::new((4, 4), 4, &tempo, beat1);
+
     let beat2 = vec![
         Track {
             instrument: &kick,
@@ -45,14 +48,15 @@ fn main() {
         },
     ];
 
+    let pattern2: Pattern = Pattern::new((4, 4), 4, &tempo, beat2);
     let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
     let sink = rodio::Sink::try_new(&stream_handle).unwrap();
     let mut looper: sampler::Sampler = sink.into();
 
     // Prepare samples
     for _ in 0..=4 {
-        looper.add_repeated(&tempo, &beat1, 3);
-        looper.add_once(&tempo, &beat2); // could also be add_repeated with 1
+        looper.add_repeated(&pattern1, 3);
+        looper.add_once(&pattern2); // could also be add_repeated with 1
     }
     // play
     looper.play_till_end();
